@@ -1,0 +1,68 @@
+.table-responsive {
+    overflow-x: auto;
+}
+
+.in-the-money {
+    background-color: rgba(40, 167, 69, 0.15) !important;
+}
+
+#priceChart {
+    min-height: 400px;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: 0.5rem;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.table tbody tr {
+    cursor: pointer;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.card-header:hover {
+    background-color: #e9ecef;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.collapsed .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.card-header[aria-expanded="false"] .toggle-icon {
+    transform: rotate(-90deg);
+}
+
+#priceHistoryTable {
+    font-size: 0.9rem;
+}
+
+.alert {
+    margin-top: 1rem;
+}
+
+.form-check-input:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
