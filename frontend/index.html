@@ -3,194 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Options Price Viewer</title>
+    <title>Yahoo Finance Options Viewer</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Vega and Vega-Lite for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.22.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.6.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.21.0"></script>
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Vega and Vega-Lite libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-    <!-- Bootstrap for styling -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
 </head>
 <body>
-    <div class="container mt-4">
-        <h1 class="mb-4">Options Price Viewer</h1>
+    <div class="container-fluid">
+        <header class="py-3 mb-4 border-bottom">
+            <div class="container d-flex align-items-center justify-content-between">
+                <h1 class="h4 mb-0">Yahoo Finance Options Viewer</h1>
+            </div>
+        </header>
         
-        <div class="row mb-4">
-            <div class="col-md-6">
+        <div class="row">
+            <!-- Options Form -->
+            <div class="col-12 mb-4">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#optionsFormCollapse" aria-expanded="true" role="button">
-                        <h5 class="mb-0">Select Options</h5>
-                        <i class="bi bi-chevron-down toggle-icon"></i>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Options Lookup</h5>
                     </div>
-                    <div class="collapse show" id="optionsFormCollapse">
-                        <div class="card-body">
-                            <form id="optionsForm">
-                                <div class="mb-3">
-                                    <label for="ticker" class="form-label">Ticker Symbol</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="ticker" placeholder="e.g. AAPL" required>
-                                        <button type="button" id="loadTicker" class="btn btn-primary">Load</button>
+                    <div class="card-body">
+                        <form id="optionsForm">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="mb-3">
+                                        <label for="ticker" class="form-label">Ticker Symbol</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="ticker" placeholder="e.g., AAPL" required>
+                                            <button type="button" class="btn btn-primary" id="loadTicker">Load</button>
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                <div class="mb-3">
-                                    <label for="expiryDate" class="form-label">Expiry Date</label>
-                                    <select class="form-select" id="expiryDate" disabled>
-                                        <option value="">Select expiry date</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label">Option Type</label>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="optionType" id="callOption" value="calls" checked>
-                                        <label class="form-check-label" for="callOption">Calls</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="optionType" id="putOption" value="puts">
-                                        <label class="form-check-label" for="putOption">Puts</label>
+                                <div class="col-md-5">
+                                    <div class="mb-3">
+                                        <label for="expiryDate" class="form-label">Expiry Date</label>
+                                        <select class="form-select" id="expiryDate" disabled>
+                                            <option value="">Select expiry date</option>
+                                        </select>
                                     </div>
                                 </div>
-                                
-                                <button type="submit" class="btn btn-success" disabled id="viewOptionsBtn">View Options Chain</button>
-                            </form>
-                        </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="mb-3 w-100">
+                                        <button type="submit" class="btn btn-success w-100" id="viewOptionsBtn" disabled>View Options</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
             
-            <div class="col-md-6">
+            <!-- Options Table -->
+            <div class="col-12 mb-4">
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#contractFormCollapse" aria-expanded="true" role="button">
-                        <h5 class="mb-0">Contract Details</h5>
-                        <i class="bi bi-chevron-down toggle-icon"></i>
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0" id="optionsTableTitle">Options Chain</h5>
                     </div>
-                    <div class="collapse show" id="contractFormCollapse">
-                        <div class="card-body">
-                            <form id="contractForm">
-                                <div class="mb-3">
-                                    <label for="strikePrice" class="form-label">Strike Price</label>
-                                    <select class="form-select" id="strikePrice" disabled>
-                                        <option value="">Select strike price</option>
-                                    </select>
-                                </div>
-                                
-                                <div id="contractDetails" class="mb-3 d-none">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h6 class="card-title">Selected Contract</h6>
-                                            <p><strong>Symbol:</strong> <span id="contractSymbol"></span></p>
-                                            <p><strong>Last Price:</strong> <span id="lastPrice"></span></p>
-                                            <p><strong>Bid:</strong> <span id="bidPrice"></span></p>
-                                            <p><strong>Ask:</strong> <span id="askPrice"></span></p>
-                                            <p><strong>Volume:</strong> <span id="volume"></span></p>
-                                            <p><strong>Open Interest:</strong> <span id="openInterest"></span></p>
-                                            <p><strong>Implied Volatility:</strong> <span id="impliedVolatility"></span></p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <button type="button" class="btn btn-primary" disabled id="viewHistoryBtn">View Price History</button>
-                            </form>
-                        </div>
+                    <div class="card-body table-responsive">
+                        <table class="table table-hover table-striped" id="optionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Strike</th>
+                                    <th colspan="4" class="text-center call-header">Calls</th>
+                                    <th colspan="4" class="text-center put-header">Puts</th>
+                                </tr>
+                                <tr>
+                                    <th>Price</th>
+                                    <!-- Call columns -->
+                                    <th>Last</th>
+                                    <th>Bid/Ask</th>
+                                    <th>Volume</th>
+                                    <th>Open Int</th>
+                                    <!-- Put columns -->
+                                    <th>Last</th>
+                                    <th>Bid/Ask</th>
+                                    <th>Volume</th>
+                                    <th>Open Int</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="9" class="text-center">No options data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#optionsTableCollapse" aria-expanded="true" role="button">
-                        <h5 id="optionsTableTitle" class="mb-0">Options Chain</h5>
-                        <div class="d-flex align-items-center">
-                            <div class="form-check form-switch me-3">
-                                <input class="form-check-input" type="checkbox" id="inTheMoney">
-                                <label class="form-check-label" for="inTheMoney">Highlight In-The-Money</label>
-                            </div>
-                            <i class="bi bi-chevron-down toggle-icon"></i>
-                        </div>
-                    </div>
-                    <div class="collapse show" id="optionsTableCollapse">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover" id="optionsTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Strike</th>
-                                            <th>Last Price</th>
-                                            <th>Bid</th>
-                                            <th>Ask</th>
-                                            <th>Change</th>
-                                            <th>% Change</th>
-                                            <th>Volume</th>
-                                            <th>Open Interest</th>
-                                            <th>Implied Volatility</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Options data will be loaded here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#priceChartCollapse" aria-expanded="true" role="button">
-                        <h5 class="mb-0">Price History Chart</h5>
-                        <i class="bi bi-chevron-down toggle-icon"></i>
-                    </div>
-                    <div class="collapse show" id="priceChartCollapse">
-                        <div class="card-body">
-                            <div id="priceChart"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#priceHistoryTableCollapse" aria-expanded="true" role="button">
-                        <h5 class="mb-0">Price History Data</h5>
-                        <i class="bi bi-chevron-down toggle-icon"></i>
-                    </div>
-                    <div class="collapse show" id="priceHistoryTableCollapse">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped" id="priceHistoryTable">
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Price</th>
-                                            <th>Volume</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Price history data will be loaded here -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
+            <!-- Chart Containers -->
+            <div class="col-12" id="chartContainers">
+                <!-- Chart sections will be dynamically added here -->
             </div>
         </div>
     </div>
     
+    <!-- Chart Section Template -->
+    <template id="chartSectionTemplate">
+        <div class="chart-section mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Strike Price: $<span class="strike-price"></span></h5>
+                    <button type="button" class="btn-close" aria-label="Close"></button>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
     <script src="js/chart.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

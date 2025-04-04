@@ -1,65 +1,175 @@
-.table-responsive {
-    overflow-x: auto;
+/* General styles */
+body {
+    background-color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.in-the-money {
-    background-color: rgba(40, 167, 69, 0.15) !important;
+.container-fluid {
+    max-width: 1400px;
+    padding: 0 20px;
 }
 
-#priceChart {
-    min-height: 400px;
-}
-
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.error-message {
-    color: #dc3545;
-    margin-top: 0.5rem;
-}
-
+/* Card styles */
 .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    margin-bottom: 1.5rem;
-}
-
-.table tbody tr {
-    cursor: pointer;
-}
-
-.table tbody tr:hover {
-    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 20px;
 }
 
 .card-header {
     background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    padding: 15px 20px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* Table styles */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    vertical-align: middle;
+}
+
+.table tbody tr {
     cursor: pointer;
+    transition: background-color 0.2s;
 }
 
-.card-header:hover {
-    background-color: #e9ecef;
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
 }
 
-.toggle-icon {
-    transition: transform 0.3s ease;
+.table tbody tr.active {
+    background-color: rgba(0, 123, 255, 0.1);
+    border-left: 3px solid #007bff;
 }
 
-.collapsed .toggle-icon {
-    transform: rotate(-90deg);
+/* Header styles for calls and puts */
+.call-header {
+    background-color: #cfe2ff;
+    color: #084298;
 }
 
-.card-header[aria-expanded="false"] .toggle-icon {
-    transform: rotate(-90deg);
+.put-header {
+    background-color: #fff3cd;
+    color: #664d03;
 }
 
-#priceHistoryTable {
-    font-size: 0.9rem;
+/* Loading state */
+.loading {
+    position: relative;
+    pointer-events: none;
 }
 
-.alert {
-    margin-top: 1rem;
+.loading::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1001;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error message styles */
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Chart section styles */
+.chart-section {
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.chart-section.active {
+    display: block;
+}
+
+.chart-container {
+    min-height: 300px;
+    width: 100%;
+    position: relative;
+}
+
+/* Tooltip styles for Vega charts */
+.vg-tooltip {
+    position: absolute;
+    z-index: 2000;
+    visibility: hidden;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 12px;
+    max-width: 250px;
+}
+
+.vg-tooltip h4 {
+    font-size: 14px;
+    margin: 0 0 5px 0;
+}
+
+.vg-tooltip table {
+    width: 100%;
+}
+
+.vg-tooltip td {
+    padding: 2px 5px;
+}
+
+.vg-tooltip td.key {
+    font-weight: bold;
+    color: #555;
+}
+
+/* Style for the options table */
+#optionsTable th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#optionsTable td {
+    text-align: right;
+    vertical-align: middle;
+}
+
+#optionsTable td:first-child {
+    text-align: center;
+    font-weight: bold;
 }
 
 .form-check-input:checked {
