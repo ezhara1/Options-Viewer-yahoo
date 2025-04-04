@@ -112,6 +112,12 @@ body {
 .chart-section {
     display: none;
     transition: all 0.3s ease;
+    width: 100%;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
 }
 
 .chart-section.active {
@@ -119,41 +125,54 @@ body {
 }
 
 .chart-container {
-    min-height: 300px;
+    min-height: 500px;
     width: 100%;
     position: relative;
+    margin: 0 auto;
+}
+
+/* Make sure the chart takes the full width */
+.chart-container > div {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Ensure SVG elements stretch to container */
+.chart-container svg {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* Tooltip styles for Vega charts */
 .vg-tooltip {
     position: absolute;
-    z-index: 2000;
-    visibility: hidden;
+    z-index: 1000;
     padding: 8px;
     background-color: rgba(255, 255, 255, 0.95);
     border: 1px solid #d9d9d9;
     border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     font-size: 12px;
-    max-width: 250px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.vg-tooltip h4 {
-    font-size: 14px;
-    margin: 0 0 5px 0;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .chart-container {
+        min-height: 350px;
+    }
 }
 
-.vg-tooltip table {
-    width: 100%;
+/* Chart title styling */
+.chart-section h4 {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.vg-tooltip td {
-    padding: 2px 5px;
-}
-
-.vg-tooltip td.key {
-    font-weight: bold;
-    color: #555;
+/* Close button styling */
+.chart-section .btn-close {
+    font-size: 0.8rem;
 }
 
 /* Style for the options table */

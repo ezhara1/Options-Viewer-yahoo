@@ -21,21 +21,36 @@ function createPriceChart(container, data, title) {
         };
     });
     
-    // Create Vega-Lite specification for the chart
+    // Create a unique ID for this chart to avoid signal name conflicts
+    const chartId = 'chart_' + Date.now();
+    
+    // Create a chart specification with zoom and pan functionality
     const spec = {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": title,
         "width": "container",
-        "height": 400,
+        "height": 500, // Increased height
+        "autosize": {
+            "type": "fit",
+            "contains": "padding"
+        },
         "data": {
             "values": formattedData
         },
-        "layer": [
+        "vconcat": [
             {
-                // Main price chart
+                // Main price chart (top)
+                "height": 400, // Increased height
                 "mark": {
                     "type": "line",
-                    "point": true
+                    "point": true,
+                    "tooltip": true
+                },
+                "selection": {
+                    "grid": {
+                        "type": "interval",
+                        "bind": "scales"
+                    }
                 },
                 "encoding": {
                     "x": {
@@ -73,10 +88,18 @@ function createPriceChart(container, data, title) {
                 }
             },
             {
-                // Volume bars at the bottom
+                // Volume bars (bottom)
+                "height": 100,
                 "mark": {
                     "type": "bar",
-                    "opacity": 0.5
+                    "opacity": 0.5,
+                    "tooltip": true
+                },
+                "selection": {
+                    "grid": {
+                        "type": "interval",
+                        "bind": "scales"
+                    }
                 },
                 "encoding": {
                     "x": {
@@ -108,37 +131,37 @@ function createPriceChart(container, data, title) {
                     ]
                 }
             }
-        ],
-        "resolve": {
-            "scale": {
-                "y": "independent"
-            }
-        },
-        // Enable zooming and panning
-        "params": [
-            {
-                "name": "zoom",
-                "select": {"type": "interval", "bind": "scales"}
-            }
         ]
     };
     
-    // Embed the chart
-    vegaEmbed(container, spec, {
-        actions: {
-            export: true,
-            source: false,
-            compiled: false,
-            editor: false
-        },
-        renderer: "canvas",
-        tooltip: {
-            theme: "light"
-        }
-    }).then(result => {
-        console.log('Chart created successfully');
-    }).catch(error => {
-        console.error('Error creating chart:', error);
+    // Create a unique div inside the container for this chart
+    const chartDiv = document.createElement('div');
+    chartDiv.id = chartId;
+    chartDiv.style.width = '50%';
+    chartDiv.style.height = '50%';
+    container.appendChild(chartDiv);
+    
+    try {
+        // Embed the chart
+        vegaEmbed('#' + chartId, spec, {
+            actions: {
+                export: true,
+                source: false,
+                compiled: false,
+                editor: false
+            },
+            renderer: "svg", // Use SVG renderer for better quality
+            tooltip: {
+                theme: "light"
+            }
+        }).then(result => {
+            console.log('Chart created successfully with ID:', chartId);
+        }).catch(error => {
+            console.error('Error creating chart:', error);
+            container.innerHTML = `<div class="alert alert-danger">Error creating chart: ${error.message}</div>`;
+        });
+    } catch (error) {
+        console.error('Exception when creating chart:', error);
         container.innerHTML = `<div class="alert alert-danger">Error creating chart: ${error.message}</div>`;
-    });
+    }
 }
