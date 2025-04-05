@@ -32,7 +32,7 @@ function createPriceChart(container, data, title) {
         "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
         "title": title,
         "width": "container",
-        "height": 500, // Increased height
+        "height": 250, // Reduced height
         "autosize": {
             "type": "fit",
             "contains": "padding"
@@ -43,7 +43,7 @@ function createPriceChart(container, data, title) {
         "vconcat": [
             {
                 // Main price chart (top)
-                "height": 400, // Increased height
+                "height": 200, // Reduced height
                 "mark": {
                     "type": "line",
                     "point": true,
@@ -92,7 +92,7 @@ function createPriceChart(container, data, title) {
             },
             {
                 // Volume bars (bottom)
-                "height": 100,
+                "height": 50,
                 "mark": {
                     "type": "bar",
                     "opacity": 0.5,
