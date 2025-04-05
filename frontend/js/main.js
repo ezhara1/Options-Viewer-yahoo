@@ -1,5 +1,5 @@
 // API base URL
-const API_BASE_URL = 'http://localhost:5000/api';
+window.API_BASE_URL = window.API_BASE_URL || 'http://localhost:5000/api';
 
 // Global variables
 let tickerInput = null;
@@ -57,66 +57,76 @@ function attachEventListeners() {
     console.log("Attaching event listeners...");
     
     if (loadTickerBtn) {
-        console.log("Adding click event to loadTickerBtn");
+        console.log("Found loadTickerBtn, attaching click listener.");
         loadTickerBtn.addEventListener('click', loadTickerOptions);
     } else {
-        console.error("loadTickerBtn not found in DOM");
+        console.error("loadTickerBtn not found in DOM when attaching listener!");
     }
     
     if (expiryDateSelect) {
-        console.log("Adding change event to expiryDateSelect");
+        console.log("Found expiryDateSelect, attaching change listener.");
         expiryDateSelect.addEventListener('change', handleExpiryDateChange);
     } else {
-        console.error("expiryDateSelect not found in DOM");
+        console.error("expiryDateSelect not found in DOM when attaching listener!");
     }
     
     if (optionsForm) {
-        console.log("Adding submit event to optionsForm");
+        console.log("Found optionsForm, attaching submit listener.");
         optionsForm.addEventListener('submit', function(e) {
+            console.log("Options form submitted.");
             e.preventDefault();
             loadOptionsChain();
         });
     } else {
-        console.error("optionsForm not found in DOM");
+        console.error("optionsForm not found in DOM when attaching listener!");
     }
 }
 
 // Load ticker options
 async function loadTickerOptions() {
-    console.log("Loading ticker options...");
+    console.log("loadTickerOptions function called.");
     
     if (!tickerInput) {
-        console.error("tickerInput is null");
+        console.error("loadTickerOptions: tickerInput element is null!");
         return;
     }
     
     const ticker = tickerInput.value.trim().toUpperCase();
+    console.log(`loadTickerOptions: Ticker entered: '${ticker}'`);
     
     if (!ticker) {
+        console.warn("loadTickerOptions: Ticker is empty.");
         showError(tickerInput, 'Please enter a valid ticker symbol');
         return;
     }
     
+    console.log("loadTickerOptions: Setting loading state to true.");
     setLoading(true);
+    currentTicker = ticker; // Store the current ticker
     
     try {
-        console.log(`Fetching options for ticker: ${ticker}`);
-        const response = await fetch(`${API_BASE_URL}/tickers/${ticker}/options`);
+        console.log(`loadTickerOptions: Fetching options expiry dates from: ${window.API_BASE_URL}/tickers/${ticker}/options`);
+        const response = await fetch(`${window.API_BASE_URL}/tickers/${ticker}/options`);
+        console.log(`loadTickerOptions: Fetch response status: ${response.status}`);
+        
         const data = await response.json();
         
         if (!response.ok) {
+            console.error("loadTickerOptions: API response not OK.", data);
             throw new Error(data.error || 'Failed to load ticker data');
         }
         
-        console.log("Received expiration dates:", data.expirationDates);
+        console.log("loadTickerOptions: Received expiration dates:", data.expirationDates);
         
         if (!expiryDateSelect) {
-            console.error("expiryDateSelect is null");
+            console.error("loadTickerOptions: expiryDateSelect element is null!");
+            setLoading(false);
             return;
         }
         
         // Clear existing options
         expiryDateSelect.innerHTML = '<option value="">Select expiry date</option>';
+        console.log("loadTickerOptions: Cleared expiry date options.");
         
         // Add new expiry dates
         data.expirationDates.forEach(date => {
@@ -125,22 +135,23 @@ async function loadTickerOptions() {
             option.textContent = formatDate(date);
             expiryDateSelect.appendChild(option);
         });
+        console.log("loadTickerOptions: Populated expiry dates.");
         
-        // Enable expiry date select
         expiryDateSelect.disabled = false;
+        viewOptionsBtn.disabled = true; // Disable view button until expiry is selected
+        optionsTableTitle.textContent = `Options Chain for ${ticker}`; // Update title
         
-        // Update current ticker
-        currentTicker = ticker;
-        
-        // Update UI
-        if (optionsTableTitle) {
-            optionsTableTitle.textContent = `${ticker} Options Chain`;
-        }
+        console.log("loadTickerOptions: Enabled expiry date select.");
         
     } catch (error) {
-        console.error('Error loading ticker options:', error);
-        showError(tickerInput, error.message);
+        console.error('loadTickerOptions: Error fetching ticker options:', error);
+        showError(tickerInput.parentNode, error.message || 'Error loading data'); // Show error near input
+        // Ensure selects/buttons are in a sensible state after error
+        expiryDateSelect.innerHTML = '<option value="">Error loading dates</option>';
+        expiryDateSelect.disabled = true;
+        viewOptionsBtn.disabled = true;
     } finally {
+        console.log("loadTickerOptions: Setting loading state to false.");
         setLoading(false);
     }
 }
@@ -182,7 +193,7 @@ async function loadOptionsChain() {
     
     try {
         console.log(`Fetching options chain for ${currentTicker} with expiry ${currentExpiryDate}`);
-        const response = await fetch(`${API_BASE_URL}/tickers/${currentTicker}/options?date=${currentExpiryDate}`);
+        const response = await fetch(`${window.API_BASE_URL}/tickers/${currentTicker}/options?date=${currentExpiryDate}`);
         const data = await response.json();
         
         if (!response.ok) {
@@ -384,7 +395,7 @@ async function loadOptionCharts(strike, call, put, chartSection) {
         let callData = null;
         if (call) {
             console.log(`Fetching call option history for strike: ${strike}`);
-            const callResponse = await fetch(`${API_BASE_URL}/tickers/${currentTicker}/option-history?type=call&strike=${strike}&expiry=${currentExpiryDate}`);
+            const callResponse = await fetch(`${window.API_BASE_URL}/tickers/${currentTicker}/option-history?type=call&strike=${strike}&expiry=${currentExpiryDate}`);
             const callResult = await callResponse.json();
             
             if (callResponse.ok && callResult.data && callResult.data.length > 0) {
@@ -399,7 +410,7 @@ async function loadOptionCharts(strike, call, put, chartSection) {
         let putData = null;
         if (put) {
             console.log(`Fetching put option history for strike: ${strike}`);
-            const putResponse = await fetch(`${API_BASE_URL}/tickers/${currentTicker}/option-history?type=put&strike=${strike}&expiry=${currentExpiryDate}`);
+            const putResponse = await fetch(`${window.API_BASE_URL}/tickers/${currentTicker}/option-history?type=put&strike=${strike}&expiry=${currentExpiryDate}`);
             const putResult = await putResponse.json();
             
             if (putResponse.ok && putResult.data && putResult.data.length > 0) {

@@ -13,8 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.6.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.21.0"></script>
     
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/styles.css">
+    <!-- Custom CSS with cache-busting parameter -->
+    <link rel="stylesheet" href="css/styles.css?v=20250404">
 </head>
 <body>
     <div class="container-fluid">
@@ -127,8 +127,33 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Custom JS -->
-    <script src="js/chart.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Custom JS with cache-busting parameters -->
+    <script src="js/chart.js?v=20250404"></script>
+    <script src="js/main.js?v=20250404"></script>
+    
+    <!-- Chrome cache-busting script -->
+    <script>
+        // Force a hard refresh of CSS only in Chrome
+        window.addEventListener('load', function() {
+            // Check if this is Chrome
+            const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+            
+            if (isChrome) {
+                console.log("Chrome detected, forcing cache refresh for CSS only");
+                
+                // Force reload of CSS only (not JS to avoid redeclaration issues)
+                const links = ['css/styles.css'];
+                links.forEach(link => {
+                    const oldLink = document.querySelector(`link[href^="${link}"]`);
+                    if (oldLink) {
+                        const newLink = document.createElement('link');
+                        newLink.rel = 'stylesheet';
+                        newLink.href = `${link}?v=${new Date().getTime()}`;
+                        oldLink.parentNode.replaceChild(newLink, oldLink);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

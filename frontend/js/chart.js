@@ -1,6 +1,8 @@
 function createPriceChart(container, data, title) {
-    // Clear the container
-    container.innerHTML = '';
+    // Clear the container completely
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
     
     // Debug the incoming data
     console.log('Chart data received:', JSON.stringify(data));
@@ -23,6 +25,7 @@ function createPriceChart(container, data, title) {
     
     // Create a unique ID for this chart to avoid signal name conflicts
     const chartId = 'chart_' + Date.now();
+    console.log('Creating chart with ID:', chartId);
     
     // Create a chart specification with zoom and pan functionality
     const spec = {
@@ -137,11 +140,25 @@ function createPriceChart(container, data, title) {
     // Create a unique div inside the container for this chart
     const chartDiv = document.createElement('div');
     chartDiv.id = chartId;
-    chartDiv.style.width = '50%';
-    chartDiv.style.height = '50%';
+    chartDiv.style.width = '100%';
+    chartDiv.style.height = '100%';
     container.appendChild(chartDiv);
     
     try {
+        // Clear any existing Vega View instances that might be in memory
+        if (window.activeVegaViews && window.activeVegaViews.length > 0) {
+            window.activeVegaViews.forEach(view => {
+                try {
+                    if (view && typeof view.finalize === 'function') {
+                        view.finalize();
+                    }
+                } catch (e) {
+                    console.error('Error finalizing Vega view:', e);
+                }
+            });
+        }
+        window.activeVegaViews = [];
+        
         // Embed the chart
         vegaEmbed('#' + chartId, spec, {
             actions: {
@@ -156,6 +173,9 @@ function createPriceChart(container, data, title) {
             }
         }).then(result => {
             console.log('Chart created successfully with ID:', chartId);
+            // Store the view for cleanup later
+            if (!window.activeVegaViews) window.activeVegaViews = [];
+            window.activeVegaViews.push(result.view);
         }).catch(error => {
             console.error('Error creating chart:', error);
             container.innerHTML = `<div class="alert alert-danger">Error creating chart: ${error.message}</div>`;
